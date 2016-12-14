@@ -2,6 +2,8 @@
 #include <GL/glew.h>
 #include "shader_prog.h"
 #include "camera.h"
+#include "texture_loader.h"
+#include "mesh.h"
 #include <GLFW/glfw3.h>
 #include <SOIL.h>
 #include <iostream>
@@ -209,32 +211,6 @@ int main()
 			2, 4, 6, //diagonal
 		};
 
-		GLuint VBO, EBO, VAO;
-		glGenVertexArrays(1, &VAO);
-		glGenBuffers(1, &VBO);
-		glGenBuffers(1, &EBO);
-
-		// Bind the Vertex Array Object first, then bind and set vertex buffer(s) and attribute pointer(s).
-		glBindVertexArray(VAO);
-
-		glBindBuffer(GL_ARRAY_BUFFER, VBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-		// vertex geometry data
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)0);
-		glEnableVertexAttribArray(0);
-
-		// vertex normal coordinates
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
-		glEnableVertexAttribArray(1);
-
-		glBindBuffer(GL_ARRAY_BUFFER, 0); // Note that this is allowed, the call to glVertexAttribPointer registered VBO as the currently bound vertex buffer object so afterwards we can safely unbind
-
-		glBindVertexArray(0); // Unbind VAO (it's always a good thing to unbind any buffer/array to prevent strange bugs)
-
 		// Set the texture wrapping parameters
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// Set texture wrapping to GL_REPEAT (usually basic wrapping method)
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -243,8 +219,31 @@ int main()
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 		// prepare textures
-		GLuint texture0 = LoadMipmapTexture(GL_TEXTURE0, "iipw.png");
-		GLuint texture1 = LoadMipmapTexture(GL_TEXTURE1, "weiti.png");
+		TextureLoader textureLoader;
+		textureLoader.loadTextures();
+		const Texture weitiTex = textureLoader.getTexture("weitiTexture");
+		const Texture iipwTex = textureLoader.getTexture("iipwTexture");
+
+		vector<Texture> meshTextures;
+		meshTextures.push_back(weitiTex);
+		meshTextures.push_back(iipwTex);
+
+		vector<Vertex> meshVertices;
+		meshVertices.push_back({ glm::vec3(1,1,1), glm::vec3(1,0,0), glm::vec2(1,1) });
+		meshVertices.push_back({ glm::vec3(1,1,0), glm::vec3(0,1,0), glm::vec2(0,1) });
+		meshVertices.push_back({ glm::vec3(1,0,1), glm::vec3(0,0,1), glm::vec2(0,0) });
+		meshVertices.push_back({ glm::vec3(1,0,0), glm::vec3(-1,0,0), glm::vec2(1,0) });
+		meshVertices.push_back({ glm::vec3(0,1,1), glm::vec3(0,-1,0), glm::vec2(1,1) });
+		meshVertices.push_back({ glm::vec3(0,1,0), glm::vec3(0,0,-1), glm::vec2(0,1) });
+		meshVertices.push_back({ glm::vec3(0,0,1), glm::vec3(1,0,0), glm::vec2(0,0) });
+		meshVertices.push_back({ glm::vec3(0,0,0), glm::vec3(0,0,1), glm::vec2(1,0) });
+
+		vector<GLuint> meshIndices;
+		for (int i = 0; i < 36; i++) {
+			meshIndices.push_back(i % 8);
+		}
+
+		Mesh mesh = Mesh(meshVertices, meshIndices, meshTextures);
 
 		// main event loop ///////////////////////////////////////////////////////////////////////////////////////////
 		while (!glfwWindowShouldClose(window))
@@ -256,17 +255,9 @@ int main()
 			glClearColor(0.1f, 0.2f, 0.3f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-			// Bind Textures using texture units
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, texture0);
-			glUniform1i(glGetUniformLocation(theProgram.get_programID(), "Texture0"), 0);
-			glActiveTexture(GL_TEXTURE1);
-			glBindTexture(GL_TEXTURE_2D, texture1);
-			glUniform1i(glGetUniformLocation(theProgram.get_programID(), "Texture1"), 1);
-
 			glm::mat4 trans = glm::mat4();
 			static GLfloat rot_angle = 0.0f;
-			trans = glm::rotate(trans, -glm::radians(rot_angle), glm::vec3(0.0f, 1.0f, 0.0f));
+			trans = glm::rotate(trans, -glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 			rot_angle += 0.02f;
 			if (rot_angle >= 360.0f)
 				rot_angle -= 360.0f;
@@ -278,7 +269,7 @@ int main()
 
 			glm::mat4 model = glm::mat4();
 			//model = glm::rotate(model, -glm::radians(0.0f), glm::vec3(1.0f, 1.0f, -1.0f));
-			model = glm::translate(model, glm::vec3(0.0f, 0.0f, 1.0f));
+			model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
 
 			GLuint transformLoc = glGetUniformLocation(theProgram.get_programID(), "transform");
 			glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
@@ -304,35 +295,11 @@ int main()
 			GLint lightPosLoc = glGetUniformLocation(theProgram.get_programID(), "lightPos");
 			glUniform3fv(lightPosLoc, 1, glm::value_ptr(diffuseLightPos));
 
-			// Draw our first triangle
-			theProgram.Use();
-
-			glBindVertexArray(VAO);
-			glDrawArrays(GL_TRIANGLES, 0, 36);
-			model = glm::translate(model, glm::vec3(0.0f, 0.0f, -2.0f));
-			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-			glDrawArrays(GL_TRIANGLES, 0, 36);
-
-			model = glm::translate(model, glm::vec3(0.0f, 2.0f, 0.0f));
-			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-			glDrawArrays(GL_TRIANGLES, 0, 36);
-
-			model = glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));
-			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-			glDrawArrays(GL_TRIANGLES, 0, 36);
-
-			model = glm::translate(model, glm::vec3(2.0f, 2.0f, 0.0f));
-			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-			glDrawArrays(GL_TRIANGLES, 0, 36);
-
-			glBindVertexArray(0);
+			mesh.draw(theProgram);
 
 			// Swap the screen buffers
 			glfwSwapBuffers(window);
 		}
-		glDeleteVertexArrays(1, &VAO);
-		glDeleteBuffers(1, &VBO);
-		glDeleteBuffers(1, &EBO);
 	}
 	catch (exception ex)
 	{

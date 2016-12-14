@@ -14,9 +14,8 @@ enum CameraDir {
 
 
 // Camera class: calculates view matrix based on current position and angles
-class Camera
-{
-private:
+class Camera {
+
 	// Camera position
 	glm::vec3 position;
 
