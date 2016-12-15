@@ -9,6 +9,7 @@
 
 using namespace std;
 
+// Vertex structure, contains position in space normal vector and texture coordinates
 struct Vertex {
 	glm::vec3 Position;
 	glm::vec3 Normal;
@@ -17,22 +18,33 @@ struct Vertex {
 
 // Mesh class, containing all data needed when rendering it
 class Mesh {
-public:
 	// Mesh Data
 	vector<Vertex> vertices;
 	vector<GLuint> indices;
 	vector<Texture> textures;
 
-	// Constructor
+	//  Render data
+	GLuint VAO, VBO, EBO;
+
+public:
+	// Constructors
 	Mesh(vector<Vertex> vertices, vector<GLuint> indices, vector<Texture> textures);
 
 	// Draw mesh using passed shader
 	void draw(ShaderProgram shader);
-private:
-	//  Render data
-	GLuint VAO, VBO, EBO;
 
 	// Set up mesh data buffers - vertices, textures
 	void initMesh();
+
+	// Pushes new vertex into vertices vector
+	void addVertex(GLfloat x, GLfloat y, GLfloat z,
+		GLfloat nx, GLfloat ny, GLfloat nz,
+		GLfloat tx, GLfloat ty);
+
+	// Pushes new index into indices vector
+	void addIndex(GLint index);
+
+	// Pushes new texture into textures vector
+	void addTexture(const Texture texture);
 };
 

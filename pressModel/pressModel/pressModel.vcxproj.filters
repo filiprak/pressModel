@@ -59,6 +59,9 @@
     <ClInclude Include="constants.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="model.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\gkom-gl\gl_05\weiti.png">

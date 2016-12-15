@@ -4,6 +4,8 @@
 #include <SOIL.h>
 #include <iostream>
 
+using namespace std;
+
 TextureLoader::TextureLoader() {
 
 }
@@ -33,5 +35,9 @@ void TextureLoader::loadTextures() {
 }
 
 const Texture TextureLoader::getTexture(const string name) {
+	if (textures.find(name) == textures.end()) {
+		string msg = "TextureLoader: texture: " + name + " is not loaded!";
+		throw exception(msg.c_str());
+	}
 	return this->textures[name];
 }

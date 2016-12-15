@@ -65,3 +65,18 @@ void Mesh::draw(ShaderProgram shader) {
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 }
+
+void Mesh::addVertex(GLfloat x, GLfloat y, GLfloat z,
+					 GLfloat nx, GLfloat ny, GLfloat nz,
+					 GLfloat tx, GLfloat ty) {
+	Vertex v = { glm::vec3(x, y, z), glm::vec3(nx, ny, nz), glm::vec2(tx, ty) };
+	this->vertices.push_back(v);
+}
+
+void Mesh::addIndex(GLint index) {
+	this->indices.push_back(index);
+}
+
+void Mesh::addTexture(const Texture texture) {
+	this->textures.push_back(texture);
+}
