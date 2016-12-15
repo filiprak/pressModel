@@ -7,6 +7,7 @@ out vec4 color;
 
 uniform sampler2D weitiTexture;
 uniform sampler2D iipwTexture;
+uniform sampler2D komanTexture;
 
 uniform vec3 lightPos;
 uniform vec3 lightColor;
@@ -31,7 +32,7 @@ void main()
 	vec3 specular = specularStrength * spec * lightColor; 
 
 	vec3 result = (diffuseLight + ambientLight + specular) * objectColor;
-    vec3 tex = (diffuseLight + ambientLight + specular) * texture(weitiTexture, TexCoords);
+    vec3 tex = (diffuseLight + ambientLight + specular) * texture(komanTexture, TexCoords);
 
 	color = vec4(tex, 0.0f);
 }

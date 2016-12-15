@@ -28,7 +28,8 @@ class Mesh {
 
 public:
 	// Constructors
-	Mesh(vector<Vertex> vertices, vector<GLuint> indices, vector<Texture> textures);
+	Mesh();
+	Mesh(vector<Vertex> vertices, vector<GLuint> indices, vector<Texture> textures = vector<Texture>());
 
 	// Draw mesh using passed shader
 	void draw(ShaderProgram shader);
@@ -40,6 +41,9 @@ public:
 	void addVertex(GLfloat x, GLfloat y, GLfloat z,
 		GLfloat nx, GLfloat ny, GLfloat nz,
 		GLfloat tx, GLfloat ty);
+
+	// Pushes new vertex into vertices vector
+	void Mesh::addVertex(Vertex vertex);
 
 	// Pushes new index into indices vector
 	void addIndex(GLint index);

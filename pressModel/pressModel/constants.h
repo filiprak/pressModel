@@ -5,10 +5,11 @@
 using namespace std;
 
 // number of textures in texturePaths
-#define NUM_TEXTURES 2
+#define NUM_TEXTURES 3
 
 // names of textures used in shaders and paths to load it from
 string texturePaths[NUM_TEXTURES * 2] {
-	"iipwTexture", "iipw.png",
-	"weitiTexture", "weiti.png",
+		"iipwTexture", "iipw.png",
+		"weitiTexture", "weiti.png",
+		"komanTexture", "koman.png",
 };

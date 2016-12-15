@@ -4,6 +4,7 @@
 #include "camera.h"
 #include "texture_loader.h"
 #include "mesh.h"
+#include "cuboid.h"
 #include <GLFW/glfw3.h>
 #include <SOIL.h>
 #include <iostream>
@@ -223,30 +224,10 @@ int main()
 		textureLoader.loadTextures();
 		const Texture weitiTex = textureLoader.getTexture("weitiTexture");
 		const Texture iipwTex = textureLoader.getTexture("iipwTexture");
+		const Texture komanTex = textureLoader.getTexture("komanTexture");
 
-		vector<Texture> meshTextures;
-		meshTextures.push_back(weitiTex);
-		cout << weitiTex.id << " " << weitiTex.name << endl;
-		cout << iipwTex.id << " " << iipwTex.name << endl;
-		meshTextures.push_back(iipwTex);
-
-		vector<Vertex> meshVertices;
-		meshVertices.push_back({ glm::vec3(1,1,0), glm::vec3(0,0,1), glm::vec2(1,1) });
-		meshVertices.push_back({ glm::vec3(-1,1,0), glm::vec3(0,0,1), glm::vec2(0,1) });
-		meshVertices.push_back({ glm::vec3(-1,-1,0), glm::vec3(0,0,1), glm::vec2(0,0) });
-		meshVertices.push_back({ glm::vec3(1,-1,0), glm::vec3(0,0,1), glm::vec2(1,0) });
-
-
-		vector<GLuint> meshIndices;
-		for (int i = 0; i < 3; i++) {
-			meshIndices.push_back(i);
-		}
-
-		for (int i = 2; i < 5; i++) {
-			meshIndices.push_back(i % 4);
-		}
-
-		Mesh mesh = Mesh(meshVertices, meshIndices, meshTextures);
+		Cuboid cube = Cuboid(1, 1, 1, glm::vec3(0,0,0), glm::vec3(45,0,0));
+		cube.addTexture(komanTex);
 
 		// main event loop ///////////////////////////////////////////////////////////////////////////////////////////
 		while (!glfwWindowShouldClose(window))
@@ -260,7 +241,7 @@ int main()
 
 			glm::mat4 trans = glm::mat4();
 			static GLfloat rot_angle = 0.0f;
-			trans = glm::rotate(trans, -glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+			trans = glm::rotate(trans, -glm::radians(rot_angle), glm::vec3(0.0f, 1.0f, 0.0f));
 			rot_angle += 0.02f;
 			if (rot_angle >= 360.0f)
 				rot_angle -= 360.0f;
@@ -270,9 +251,7 @@ int main()
 			glm::mat4 projection;
 			projection = glm::perspective(20.0f, (GLfloat)WIDTH / HEIGHT, 0.1f, 100.0f);
 
-			glm::mat4 model = glm::mat4();
-			//model = glm::rotate(model, -glm::radians(0.0f), glm::vec3(1.0f, 1.0f, -1.0f));
-			model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
+			glm::mat4 model = cube.getModelMatrix();
 
 			GLuint transformLoc = glGetUniformLocation(theProgram.get_programID(), "transform");
 			glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
@@ -298,7 +277,7 @@ int main()
 			GLint lightPosLoc = glGetUniformLocation(theProgram.get_programID(), "lightPos");
 			glUniform3fv(lightPosLoc, 1, glm::value_ptr(diffuseLightPos));
 
-			mesh.draw(theProgram);
+			cube.draw(theProgram);
 
 			// Swap the screen buffers
 			glfwSwapBuffers(window);

@@ -1,13 +1,14 @@
 #include "mesh.h"
 
+Mesh::Mesh() {
+
+}
 
 Mesh::Mesh(vector<Vertex> vertices, vector<GLuint> indices, vector<Texture> textures)
 {
 	this->vertices = vertices;
 	this->indices = indices;
 	this->textures = textures;
-
-	this->initMesh();
 }
 
 void Mesh::initMesh()
@@ -69,8 +70,13 @@ void Mesh::draw(ShaderProgram shader) {
 void Mesh::addVertex(GLfloat x, GLfloat y, GLfloat z,
 					 GLfloat nx, GLfloat ny, GLfloat nz,
 					 GLfloat tx, GLfloat ty) {
-	Vertex v = { glm::vec3(x, y, z), glm::vec3(nx, ny, nz), glm::vec2(tx, ty) };
+	Vertex v = { glm::vec3(x, y, z), glm::normalize(glm::vec3(nx, ny, nz)), glm::vec2(tx, ty) };
 	this->vertices.push_back(v);
+}
+
+void Mesh::addVertex(Vertex vertex) {
+	glm::normalize(vertex.Normal);
+	this->vertices.push_back(vertex);
 }
 
 void Mesh::addIndex(GLint index) {
