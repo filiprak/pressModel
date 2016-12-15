@@ -142,7 +142,7 @@ int main()
 		cout << "Max texture coords allowed: " << nrAttributes << std::endl;
 
 		// Build, compile and link shader program
-		ShaderProgram theProgram("main.vert", "main.frag");
+		ShaderProgram theProgram("main.vert.shader", "main.frag.shader");
 
 		// Set up vertex data 
 		GLfloat vertices[] = {
@@ -226,21 +226,24 @@ int main()
 
 		vector<Texture> meshTextures;
 		meshTextures.push_back(weitiTex);
+		cout << weitiTex.id << " " << weitiTex.name << endl;
+		cout << iipwTex.id << " " << iipwTex.name << endl;
 		meshTextures.push_back(iipwTex);
 
 		vector<Vertex> meshVertices;
-		meshVertices.push_back({ glm::vec3(1,1,1), glm::vec3(1,0,0), glm::vec2(1,1) });
-		meshVertices.push_back({ glm::vec3(1,1,0), glm::vec3(0,1,0), glm::vec2(0,1) });
-		meshVertices.push_back({ glm::vec3(1,0,1), glm::vec3(0,0,1), glm::vec2(0,0) });
-		meshVertices.push_back({ glm::vec3(1,0,0), glm::vec3(-1,0,0), glm::vec2(1,0) });
-		meshVertices.push_back({ glm::vec3(0,1,1), glm::vec3(0,-1,0), glm::vec2(1,1) });
-		meshVertices.push_back({ glm::vec3(0,1,0), glm::vec3(0,0,-1), glm::vec2(0,1) });
-		meshVertices.push_back({ glm::vec3(0,0,1), glm::vec3(1,0,0), glm::vec2(0,0) });
-		meshVertices.push_back({ glm::vec3(0,0,0), glm::vec3(0,0,1), glm::vec2(1,0) });
+		meshVertices.push_back({ glm::vec3(1,1,0), glm::vec3(0,0,1), glm::vec2(1,1) });
+		meshVertices.push_back({ glm::vec3(-1,1,0), glm::vec3(0,0,1), glm::vec2(0,1) });
+		meshVertices.push_back({ glm::vec3(-1,-1,0), glm::vec3(0,0,1), glm::vec2(0,0) });
+		meshVertices.push_back({ glm::vec3(1,-1,0), glm::vec3(0,0,1), glm::vec2(1,0) });
+
 
 		vector<GLuint> meshIndices;
-		for (int i = 0; i < 36; i++) {
-			meshIndices.push_back(i % 8);
+		for (int i = 0; i < 3; i++) {
+			meshIndices.push_back(i);
+		}
+
+		for (int i = 2; i < 5; i++) {
+			meshIndices.push_back(i % 4);
 		}
 
 		Mesh mesh = Mesh(meshVertices, meshIndices, meshTextures);

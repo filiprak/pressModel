@@ -3,6 +3,7 @@
 class ShaderProgram
 {
 	GLuint program_id; 	// The program ID
+
 public:
 	// Constructor reads and builds the shader
 	ShaderProgram(const GLchar* vertexPath, const GLchar* fragmentPath);

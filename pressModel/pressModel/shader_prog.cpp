@@ -20,7 +20,7 @@ string read_shader_code(const GLchar* shaderPath)
 	return shader_stream.str();
 }
 
-GLuint compile_shader(const GLchar* shaderCode, GLenum shaderType)
+GLuint compile_shader(const GLchar* shaderCode, GLenum shaderType, const GLchar* shaderPath)
 {
 	GLuint shader_id = glCreateShader(shaderType);
 	glShaderSource(shader_id, 1, &shaderCode, NULL);
@@ -33,7 +33,7 @@ GLuint compile_shader(const GLchar* shaderCode, GLenum shaderType)
 	{
 		GLchar infoLog[512];
 		glGetShaderInfoLog(shader_id, sizeof(infoLog), NULL, infoLog);
-		string msg = string("Shader compilation: ") + infoLog;
+		string msg = string(shaderPath) + string(": shader compilation: ") + infoLog;
 		throw exception(msg.c_str());
 	}
 	return shader_id;
@@ -43,10 +43,10 @@ ShaderProgram::ShaderProgram(const GLchar* vertexPath, const GLchar* fragmentPat
 {
 	// prepare vertex and fragment shaders
 	string vertex_code = read_shader_code(vertexPath);
-	GLuint vertex_id = compile_shader(vertex_code.c_str(), GL_VERTEX_SHADER);
+	GLuint vertex_id = compile_shader(vertex_code.c_str(), GL_VERTEX_SHADER, vertexPath);
 
 	string fragment_code = read_shader_code(fragmentPath);
-	GLuint fragment_id = compile_shader(fragment_code.c_str(), GL_FRAGMENT_SHADER);
+	GLuint fragment_id = compile_shader(fragment_code.c_str(), GL_FRAGMENT_SHADER, fragmentPath);
 
 	// link shader program
 	program_id = glCreateProgram();
@@ -61,7 +61,7 @@ ShaderProgram::ShaderProgram(const GLchar* vertexPath, const GLchar* fragmentPat
 	{
 		GLchar infoLog[512];
 		glGetProgramInfoLog(program_id, sizeof(infoLog), NULL, infoLog);
-		string msg = string("Shader program linking: ") + infoLog;
+		string msg = string(vertexPath) + string(", ") + string(fragmentPath) + string(": shader program linking: ") + infoLog;
 		throw exception(msg.c_str());
 	}
 

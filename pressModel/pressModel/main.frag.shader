@@ -1,11 +1,12 @@
 #version 330 core
 in vec3 Normal;
+in vec2 TexCoords;
 in vec3 FragPos;
 
 out vec4 color;
 
-uniform sampler2D Texture0;
-uniform sampler2D Texture1;
+uniform sampler2D weitiTexture;
+uniform sampler2D iipwTexture;
 
 uniform vec3 lightPos;
 uniform vec3 lightColor;
@@ -30,5 +31,7 @@ void main()
 	vec3 specular = specularStrength * spec * lightColor; 
 
 	vec3 result = (diffuseLight + ambientLight + specular) * objectColor;
-    color = vec4(result, 1.0f);
+    vec3 tex = (diffuseLight + ambientLight + specular) * texture(weitiTexture, TexCoords);
+
+	color = vec4(tex, 0.0f);
 }

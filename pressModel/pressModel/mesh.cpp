@@ -50,7 +50,7 @@ void Mesh::draw(ShaderProgram shader) {
 		glUniform1i(glGetUniformLocation(shader.get_programID(), (this->textures[i].name).c_str()), i);
 		glBindTexture(GL_TEXTURE_2D, this->textures[i].id);
 	}
-	glActiveTexture(GL_TEXTURE0);
+	//glActiveTexture(GL_TEXTURE0);
 
 	shader.Use();
 	// Draw mesh
