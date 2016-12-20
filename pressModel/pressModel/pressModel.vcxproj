@@ -83,6 +83,7 @@
     <ClInclude Include="camera.h" />
     <ClInclude Include="constants.h" />
     <ClInclude Include="cuboid.h" />
+    <ClInclude Include="light.h" />
     <ClInclude Include="mesh.h" />
     <ClInclude Include="model.h" />
     <ClInclude Include="shader_prog.h" />

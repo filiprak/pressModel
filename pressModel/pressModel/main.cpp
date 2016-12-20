@@ -2,6 +2,7 @@
 #include <GL/glew.h>
 #include "shader_prog.h"
 #include "camera.h"
+#include "light.h"
 #include "texture_loader.h"
 #include "mesh.h"
 #include "cuboid.h"
@@ -16,12 +17,10 @@ using namespace std;
 const GLuint WIDTH = 800, HEIGHT = 600;
 GLfloat lastX = 400, lastY = 300; //mouse initial coords
 
-Camera *camera = new Camera(0.0f, 0.0f, -5.0f, 0.0f, 0.0f);
+Camera camera(0.0f, 0.0f, -5.0f, 0.0f, 0.0f);
+Light light(glm::vec3(0.0, 0.0, 0.0));
 
-GLfloat vrads = 0.0f, hrads = 0.0f, zoom = -3.0f, x = 0.0f, y = 0.0f;
-float speed = 0.4f, speedscroll = 0.1f, movespeed = 0.003f;
-
-glm::vec3 diffuseLightPos = glm::vec3(9.0f, 9.0f, 9.0f);
+glm::vec3 diffuseLightPos = glm::vec3(0.0f, 9.0f, 0.0f);
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode)
 {
@@ -29,17 +28,17 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GL_TRUE);
 	if (key == GLFW_KEY_UP)
-		camera->move(HORIZONTAL, 1.0f);
+		camera.move(HORIZONTAL, 1.0f);
 	if (key == GLFW_KEY_DOWN)
-		camera->move(HORIZONTAL, -1.0f);
+		camera.move(HORIZONTAL, -1.0f);
 	if (key == GLFW_KEY_LEFT)
-		camera->move(VERTICAL, 1.0f);
+		camera.move(VERTICAL, 1.0f);
 	if (key == GLFW_KEY_RIGHT)
-		camera->move(VERTICAL, -1.0f);
+		camera.move(VERTICAL, -1.0f);
 	if (key == GLFW_KEY_W)
-		camera->move(ZOOM, 1.0f);
+		light.changeIntensity(0.1f);
 	if (key == GLFW_KEY_S)
-		camera->move(ZOOM, -1.0f);
+		light.changeIntensity(-0.1f);
 }
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
@@ -49,19 +48,19 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
 	lastY = ypos;
 
 	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
-		camera->move(VERTICAL, xoffset);
-		camera->move(HORIZONTAL, yoffset);
+		camera.move(VERTICAL, xoffset);
+		camera.move(HORIZONTAL, yoffset);
 		return;
 	}
 
-	camera->rotate(VERTICAL, xoffset);
-	camera->rotate(HORIZONTAL, yoffset);
+	camera.rotate(VERTICAL, xoffset);
+	camera.rotate(HORIZONTAL, yoffset);
 }
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
 	cout << yoffset << endl;
-	camera->move(ZOOM, yoffset);
+	camera.move(ZOOM, yoffset);
 }
 
 GLuint LoadMipmapTexture(GLuint texId, const char* fname)
@@ -144,73 +143,9 @@ int main()
 
 		// Build, compile and link shader program
 		ShaderProgram theProgram("main.vert.shader", "main.frag.shader");
+		vector<ShaderProgram> shaders;
+		shaders.push_back(theProgram);
 
-		// Set up vertex data 
-		GLfloat vertices[] = {
-			-0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
-			0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
-			0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
-			0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
-			-0.5f, 0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
-			-0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f,
-
-			-0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
-			0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
-			0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
-			0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
-			-0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
-			-0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
-
-			-0.5f, 0.5f, 0.5f, -1.0f, 0.0f, 0.0f,
-			-0.5f, 0.5f, -0.5f, -1.0f, 0.0f, 0.0f,
-			-0.5f, -0.5f, -0.5f, -1.0f, 0.0f, 0.0f,
-			-0.5f, -0.5f, -0.5f, -1.0f, 0.0f, 0.0f,
-			-0.5f, -0.5f, 0.5f, -1.0f, 0.0f, 0.0f,
-			-0.5f, 0.5f, 0.5f, -1.0f, 0.0f, 0.0f,
-
-			0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
-			0.5f, 0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
-			0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
-			0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
-			0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
-			0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
-
-			-0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f,
-			0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f,
-			0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f,
-			0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f,
-			-0.5f, -0.5f, 0.5f, 0.0f, -1.0f, 0.0f,
-			-0.5f, -0.5f, -0.5f, 0.0f, -1.0f, 0.0f,
-
-			-0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-			0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-			0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
-			0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
-			-0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
-			-0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f
-		};
-
-		GLuint indices[] = {
-			0, 1, 2,
-			0, 2, 3,
-
-			0, 4, 7,
-			0, 7, 3,
-
-			2, 3, 7,
-			2, 7, 6,
-
-			6, 7, 4,
-			6, 4, 5,
-
-			2, 6, 5,
-			2, 5, 1,
-
-			1, 0, 4,
-			1, 4, 5,
-
-			2, 4, 6, //diagonal
-		};
 
 		// Set the texture wrapping parameters
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// Set texture wrapping to GL_REPEAT (usually basic wrapping method)
@@ -225,9 +160,24 @@ int main()
 		const Texture weitiTex = textureLoader.getTexture("weitiTexture");
 		const Texture iipwTex = textureLoader.getTexture("iipwTexture");
 		const Texture komanTex = textureLoader.getTexture("komanTexture");
+		const Texture metalTex = textureLoader.getTexture("metalTexture");
 
-		Cuboid cube = Cuboid(1, 1, 1, glm::vec3(0,0,0), glm::vec3(45,0,0));
-		cube.addTexture(komanTex);
+		Cuboid cube = Cuboid(2, 8, 4, glm::vec3(6,0,0), glm::vec3(0,0,0));
+		cube.addTexture(metalTex);
+		Cuboid cube2 = Cuboid(2, 8, 4, glm::vec3(-6, 0, 0), glm::vec3(0, 0, 0));
+		cube2.addTexture(metalTex);
+		Cuboid cube3 = Cuboid(14, 2, 4, glm::vec3(0, 5, 0), glm::vec3(0, 0, 0));
+		cube3.addTexture(metalTex);
+		Cuboid cubeFloor = Cuboid(100, 0.5, 100, glm::vec3(0, -4.25, 0), glm::vec3(0, 0, 0));
+		cubeFloor.addTexture(metalTex);
+
+		Cuboid cubeLight = Cuboid(1, 1, 1, diffuseLightPos, glm::vec3(0, 0, 0));
+		cubeLight.addTexture(komanTex);
+
+		// light
+		glm::vec3 objectColor = glm::vec3(0.9f, 0.0f, 0.0f);
+		
+		
 
 		// main event loop ///////////////////////////////////////////////////////////////////////////////////////////
 		while (!glfwWindowShouldClose(window))
@@ -236,48 +186,22 @@ int main()
 			glfwPollEvents();
 
 			// Clear the colorbuffer
-			glClearColor(0.1f, 0.2f, 0.3f, 1.0f);
+			glClearColor(0.1f, 0.1f, 0.2f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-			glm::mat4 trans = glm::mat4();
 			static GLfloat rot_angle = 0.0f;
-			trans = glm::rotate(trans, -glm::radians(rot_angle), glm::vec3(0.0f, 1.0f, 0.0f));
-			rot_angle += 0.02f;
+			rot_angle += 0.001f;
 			if (rot_angle >= 360.0f)
 				rot_angle -= 360.0f;
 
-			glm::mat4 view = camera->getViewMatrix();
+			camera.use(shaders, WIDTH, HEIGHT, 20.0f);
+			light.use(shaders);
 
-			glm::mat4 projection;
-			projection = glm::perspective(20.0f, (GLfloat)WIDTH / HEIGHT, 0.1f, 100.0f);
-
-			glm::mat4 model = cube.getModelMatrix();
-
-			GLuint transformLoc = glGetUniformLocation(theProgram.get_programID(), "transform");
-			glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
-
-			GLint modelLoc = glGetUniformLocation(theProgram.get_programID(), "model");
-			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-
-			GLint viewLoc = glGetUniformLocation(theProgram.get_programID(), "view");
-			glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-
-			GLint projLoc = glGetUniformLocation(theProgram.get_programID(), "projection");
-			glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
-
-			// light
-			glm::vec3 lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
-			glm::vec3 objectColor = glm::vec3(0.9f, 0.0f, 0.0f);
-			GLint objectColorLoc = glGetUniformLocation(theProgram.get_programID(), "objectColor");
-			glUniform3fv(objectColorLoc, 1, glm::value_ptr(objectColor));
-
-			GLint lightLoc = glGetUniformLocation(theProgram.get_programID(), "lightColor");
-			glUniform3fv(lightLoc, 1, glm::value_ptr(lightColor));
-
-			GLint lightPosLoc = glGetUniformLocation(theProgram.get_programID(), "lightPos");
-			glUniform3fv(lightPosLoc, 1, glm::value_ptr(diffuseLightPos));
-
+			cube.setColor(glm::vec3(0.3, 0.1, 0.7));
 			cube.draw(theProgram);
+			cube2.draw(theProgram);
+			cube3.draw(theProgram);
+			cubeFloor.draw(theProgram);
 
 			// Swap the screen buffers
 			glfwSwapBuffers(window);

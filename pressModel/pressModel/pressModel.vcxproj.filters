@@ -33,9 +33,6 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files\main</Filter>
     </ClCompile>
-    <ClCompile Include="camera.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="mesh.cpp">
       <Filter>Source Files\primitives</Filter>
     </ClCompile>
@@ -47,6 +44,9 @@
     </ClCompile>
     <ClCompile Include="cuboid.cpp">
       <Filter>Source Files\primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="camera.cpp">
+      <Filter>Source Files\main</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -70,6 +70,9 @@
     </ClInclude>
     <ClInclude Include="cuboid.h">
       <Filter>Header Files\primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="light.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

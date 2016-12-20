@@ -6,6 +6,7 @@
 
 using namespace std;
 
+
 struct Texture {
 	GLuint id;
 	string name; // Texture names must be unique because they are also uniform names

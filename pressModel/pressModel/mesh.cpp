@@ -1,14 +1,17 @@
 #include "mesh.h"
+#include <glm/gtc/type_ptr.hpp>
 
-Mesh::Mesh() {
-
+Mesh::Mesh(glm::vec3 color) {
+	this->color = color;
 }
 
-Mesh::Mesh(vector<Vertex> vertices, vector<GLuint> indices, vector<Texture> textures)
+Mesh::Mesh(vector<Vertex> vertices, vector<GLuint> indices, vector<Texture> textures,
+	glm::vec3 color)
 {
 	this->vertices = vertices;
 	this->indices = indices;
 	this->textures = textures;
+	this->color = color;
 }
 
 void Mesh::initMesh()
@@ -43,7 +46,7 @@ void Mesh::initMesh()
 	glBindVertexArray(0);
 }
 
-void Mesh::draw(ShaderProgram shader) {
+void Mesh::draw(ShaderProgram shader) const {
 	for (GLuint i = 0; i < this->textures.size(); i++)
 	{
 		glActiveTexture(GL_TEXTURE0 + i); // Activate proper texture unit before binding
@@ -51,7 +54,9 @@ void Mesh::draw(ShaderProgram shader) {
 		glUniform1i(glGetUniformLocation(shader.get_programID(), (this->textures[i].name).c_str()), i);
 		glBindTexture(GL_TEXTURE_2D, this->textures[i].id);
 	}
-	//glActiveTexture(GL_TEXTURE0);
+	
+	GLint objectColorLoc = glGetUniformLocation(shader.get_programID(), "meshColor");
+	glUniform3fv(objectColorLoc, 1, glm::value_ptr(this->color));
 
 	shader.Use();
 	// Draw mesh
@@ -85,4 +90,8 @@ void Mesh::addIndex(GLint index) {
 
 void Mesh::addTexture(const Texture texture) {
 	this->textures.push_back(texture);
+}
+
+void Mesh::setColor(glm::vec3 color) {
+	this->color = color;
 }

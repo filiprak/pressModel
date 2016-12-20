@@ -1,7 +1,9 @@
 #include "camera.h"
 
-#include <glm/gtc/matrix_transform.hpp>
 #include <GL/glew.h>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 
 Camera::Camera(GLfloat xpos, GLfloat ypos, GLfloat zpos, GLfloat vrads, GLfloat hrads) {
 	this->position = glm::vec3(xpos, ypos, zpos);
@@ -53,4 +55,22 @@ glm::mat4 Camera::getViewMatrix() {
 	}
 	this->update = false;
 	return (this->viewMat);
+}
+
+glm::vec3 Camera::getPosition() {
+	return (this->position);
+}
+
+void Camera::use(vector<ShaderProgram> shaders, GLuint width, GLuint height, GLfloat fovy, GLfloat znear, GLfloat zfar) {
+	for (int i = 0; i < shaders.size(); ++i) {
+		GLint viewLoc = glGetUniformLocation(shaders[i].get_programID(), "view");
+		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(this->getViewMatrix()));
+
+		glm::mat4 projection = glm::perspective(fovy, (GLfloat) width / height, znear, zfar);
+		GLint projLoc = glGetUniformLocation(shaders[i].get_programID(), "projection");
+		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
+
+		GLint camPos = glGetUniformLocation(shaders[i].get_programID(), "camPosition");
+		glUniform3fv(camPos, 1, glm::value_ptr(this->position));
+	}
 }

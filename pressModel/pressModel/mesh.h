@@ -22,17 +22,19 @@ class Mesh {
 	vector<Vertex> vertices;
 	vector<GLuint> indices;
 	vector<Texture> textures;
+	glm::vec3 color;
 
 	//  Render data
 	GLuint VAO, VBO, EBO;
 
 public:
 	// Constructors
-	Mesh();
-	Mesh(vector<Vertex> vertices, vector<GLuint> indices, vector<Texture> textures = vector<Texture>());
+	Mesh(glm::vec3 color = glm::vec3(0.5, 0.5, 0.5));
+	Mesh(vector<Vertex> vertices, vector<GLuint> indices, vector<Texture> textures = vector<Texture>(),
+		glm::vec3 color = glm::vec3(0.5, 0.5, 0.5));
 
 	// Draw mesh using passed shader
-	void draw(ShaderProgram shader);
+	void draw(ShaderProgram shader) const;
 
 	// Set up mesh data buffers - vertices, textures
 	void initMesh();
@@ -50,5 +52,8 @@ public:
 
 	// Pushes new texture into textures vector
 	void addTexture(const Texture texture);
+
+	// Set RGB color of mesh
+	void setColor(glm::vec3 color);
 };
 
