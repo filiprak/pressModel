@@ -5,60 +5,64 @@
 #include <glm/gtc/type_ptr.hpp>
 
 
-Camera::Camera(GLfloat xpos, GLfloat ypos, GLfloat zpos, GLfloat vrads, GLfloat hrads) {
-	this->position = glm::vec3(xpos, ypos, zpos);
+Camera::Camera(GLfloat radius, GLfloat vrads, GLfloat hrads) {
+	this->radius = glm::abs(radius);
+	if (this->radius < this->minRadius)
+		this->radius = this->minRadius;
+	if (this->radius > this->maxRadius)
+		this->radius = this->maxRadius;
 	this->vrads = vrads;
 	this->hrads = hrads;
 
-	this->positionMat = glm::translate(this->positionMat, this->position);
+	this->positionMat = glm::translate(this->positionMat, glm::vec3(0.0, 0.0, -this->radius));
 	this->vrotationMat = glm::rotate(this->vrotationMat, -glm::radians(this->vrads), glm::vec3(0.0f, 1.0f, 0.0f));
 	this->hrotationMat = glm::rotate(this->hrotationMat, -glm::radians(this->hrads), glm::vec3(1.0f, 0.0f, 0.0f));
 	this->viewMat = getViewMatrix();
 	this->update = false;
 }
 
-void Camera::move(CameraDir direction, GLfloat distance)
-{
-	glm::vec3 deltaPos = glm::vec3(0.0, 0.0, 0.0);
+void Camera::move(GLfloat distance) {
+	GLfloat delta = distance * (this->zoomSpeed);
+	this->radius -= delta;
+	if (this->radius < this->minRadius)
+		this->radius = this->minRadius;
+	if (this->radius > this->maxRadius)
+		this->radius = this->maxRadius;
 
-	if (direction == ZOOM)
-		deltaPos.z += distance * (this->zoomSpeed);
-	else if (direction == VERTICAL)
-		deltaPos.x -= distance * (this->moveSpeed);
-	else if (direction == HORIZONTAL)
-		deltaPos.y -= distance * (this->moveSpeed);
-	else return;
+	this->positionMat = glm::translate(glm::mat4(), glm::vec3(0.0, 0.0, -this->radius));
 
-	this->position += deltaPos;
-	this->positionMat = glm::translate(glm::mat4(), position);
-	
 	this->update = true;
 }
 
 void Camera::rotate(CameraDir direction, GLfloat angle) {
 	if (direction == VERTICAL) {
-		this->vrads += angle * (this->rotateSpeed);
+		this->vrads -= angle * (this->rotateSpeed);
 		this->vrotationMat = glm::rotate(this->vrotationMat, glm::radians(angle * (this->rotateSpeed)), glm::vec3(0.0f, 1.0f, 0.0f));
 	}
 	else if (direction == HORIZONTAL) {
-		this->hrads += angle * (this->rotateSpeed);
+		this->hrads -= angle * (this->rotateSpeed);
 		this->hrotationMat = glm::rotate(this->hrotationMat, -glm::radians(angle * (this->rotateSpeed)), glm::vec3(1.0f, 0.0f, 0.0f));
 	}
 	else return;
 
 	this->update = true;
+
 }
 
 glm::mat4 Camera::getViewMatrix() {
 	if (update) {
-		this->viewMat = (this->positionMat) * (this->vrotationMat) * (this->hrotationMat);
+		this->viewMat = (this->positionMat) * (this->hrotationMat) * (this->vrotationMat);
 	}
 	this->update = false;
 	return (this->viewMat);
 }
 
 glm::vec3 Camera::getPosition() {
-	return (this->position);
+	GLfloat x, y, z;
+	x = this->radius * glm::cos(glm::radians(this->hrads)) * glm::sin(glm::radians(this->vrads));
+	y = this->radius * glm::sin(glm::radians(this->hrads));
+	z = this->radius * glm::cos(glm::radians(this->hrads)) * glm::cos(glm::radians(this->vrads));
+	return glm::vec3(x, y, z);
 }
 
 void Camera::use(vector<ShaderProgram> shaders, GLuint width, GLuint height, GLfloat fovy, GLfloat znear, GLfloat zfar) {
@@ -71,6 +75,6 @@ void Camera::use(vector<ShaderProgram> shaders, GLuint width, GLuint height, GLf
 		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
 		GLint camPos = glGetUniformLocation(shaders[i].get_programID(), "camPosition");
-		glUniform3fv(camPos, 1, glm::value_ptr(this->position));
+		glUniform3fv(camPos, 1, glm::value_ptr(this->getPosition()));
 	}
 }

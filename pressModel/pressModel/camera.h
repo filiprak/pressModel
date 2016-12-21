@@ -10,7 +10,6 @@ using namespace std;
 
 // Defines several possible options for camera movement. Used as abstraction to stay away from window-system specific input methods
 enum CameraDir {
-	ZOOM,
 	VERTICAL,
 	HORIZONTAL
 };
@@ -19,8 +18,8 @@ enum CameraDir {
 // Camera class: calculates view matrix based on current position and angles
 class Camera {
 
-	// Camera position
-	glm::vec3 position;
+	// Camera movement sphere radious
+	GLfloat radius;
 
 	// Camera transformation matrices
 	glm::mat4 viewMat, vrotationMat, hrotationMat, positionMat;
@@ -33,11 +32,14 @@ class Camera {
 	bool update = true;
 
 public:
+	// Camera position constraints
+	GLfloat minRadius = 10.0f, maxRadius = 100.0f;
+
 	// Camera movement speeds
-	GLfloat zoomSpeed = 0.5f, rotateSpeed = 0.2f, moveSpeed = 0.01f;
+	GLfloat zoomSpeed = 0.9f, rotateSpeed = 0.2f;
 
 	// Constructor
-	Camera(GLfloat xpos, GLfloat ypos, GLfloat zpos, GLfloat vrads, GLfloat hrads);
+	Camera(GLfloat radius, GLfloat vrads, GLfloat hrads);
 
 	// Returns the view matrix
 	glm::mat4 getViewMatrix();
@@ -50,7 +52,7 @@ public:
 	glm::vec3 getPosition();
 
 	// Changes camera position vector
-	void move(CameraDir direction, GLfloat distance);
+	void move(GLfloat distance);
 
 	// Changes camera vertical or horizontal angles
 	void rotate(CameraDir direction, GLfloat angle);

@@ -29,15 +29,15 @@ void main()
 	float diff = max(dot(norm, lightDir), 0.0);
 	vec3 diffuseLight = lightIntensity * diff * lightColor;
 
-	float specularStrength = 5.9f;
+	// reflect light specification
+	float specIntensity = 0.8f;
 	vec3 viewDir = normalize(camPosition - FragPos);
-	vec3 speclightDir = vec3(0.0, -1.0, 0.0);
-	vec3 reflectDir = reflect(speclightDir, norm); 
-	float spec = pow(max(dot(viewDir, reflectDir), 0.0), 16);
-	vec3 specular = specularStrength * spec * lightColor; 
+	vec3 reflectDir = normalize(reflect(-lightDir, norm));
+	float spec = pow(max(dot(viewDir, reflectDir), 0.0), 64);
+	vec3 specular = specIntensity * spec * lightColor; 
 
-	vec3 result = (diffuseLight + ambientLight) * meshColor;
-    vec3 tex = (diffuseLight + ambientLight) * texture(metalTexture, TexCoords);
+	vec3 result = (diffuseLight + ambientLight + specular) * meshColor;
+    vec3 tex = (diffuseLight + ambientLight + specular) * texture(metalTexture, TexCoords);
 
 	color = vec4(result, 1.0f);
 }

@@ -15,26 +15,34 @@ using namespace std;
 #include <glm/gtc/type_ptr.hpp>
 
 const GLuint WIDTH = 800, HEIGHT = 600;
-GLfloat lastX = 400, lastY = 300; //mouse initial coords
 
-Camera camera(0.0f, 0.0f, -5.0f, 0.0f, 0.0f);
-Light light(glm::vec3(0.0, 0.0, 0.0));
+Camera camera(24.0f, 0.0f, 0.0f);
 
-glm::vec3 diffuseLightPos = glm::vec3(0.0f, 9.0f, 0.0f);
+glm::vec3 diffuseLightPos = glm::vec3(15.0f, 7.0f, 20.0f);
+Light light(diffuseLightPos);
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode)
 {
 	cout << key << endl;
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GL_TRUE);
-	if (key == GLFW_KEY_UP)
-		camera.move(HORIZONTAL, 1.0f);
-	if (key == GLFW_KEY_DOWN)
+	if (key == GLFW_KEY_C) {
+		static bool enable = true;
+		if (enable) {
+			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+			enable = false;
+		}
+		else {
+			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+			enable = true;
+		}
+	}
+	/*if (key == GLFW_KEY_DOWN)
 		camera.move(HORIZONTAL, -1.0f);
 	if (key == GLFW_KEY_LEFT)
 		camera.move(VERTICAL, 1.0f);
 	if (key == GLFW_KEY_RIGHT)
-		camera.move(VERTICAL, -1.0f);
+		camera.move(VERTICAL, -1.0f);*/
 	if (key == GLFW_KEY_W)
 		light.changeIntensity(0.1f);
 	if (key == GLFW_KEY_S)
@@ -42,16 +50,17 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 }
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
+	static GLfloat lastX = WIDTH / 2, lastY = HEIGHT / 2;
 	GLfloat xoffset = xpos - lastX;
 	GLfloat yoffset = lastY - ypos; // Reversed since y-coordinates range from bottom to top
 	lastX = xpos;
 	lastY = ypos;
 
-	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
+	/*if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
 		camera.move(VERTICAL, xoffset);
 		camera.move(HORIZONTAL, yoffset);
 		return;
-	}
+	}*/
 
 	camera.rotate(VERTICAL, xoffset);
 	camera.rotate(HORIZONTAL, yoffset);
@@ -60,7 +69,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
 	cout << yoffset << endl;
-	camera.move(ZOOM, yoffset);
+	camera.move(yoffset);
 }
 
 GLuint LoadMipmapTexture(GLuint texId, const char* fname)
@@ -117,12 +126,13 @@ int main()
 		if (window == nullptr)
 			throw exception("GLFW window not created");
 
-		glfwSetCursorPos(window, lastX, lastY);
+		glfwSetCursorPos(window, WIDTH/2, HEIGHT/2);
 
 		glfwMakeContextCurrent(window);
 		glfwSetKeyCallback(window, key_callback);
 		glfwSetCursorPosCallback(window, mouse_callback);
 		glfwSetScrollCallback(window, scroll_callback);
+
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 		glewExperimental = GL_TRUE;
@@ -176,8 +186,6 @@ int main()
 
 		// light
 		glm::vec3 objectColor = glm::vec3(0.9f, 0.0f, 0.0f);
-		
-		
 
 		// main event loop ///////////////////////////////////////////////////////////////////////////////////////////
 		while (!glfwWindowShouldClose(window))
@@ -195,6 +203,9 @@ int main()
 				rot_angle -= 360.0f;
 
 			camera.use(shaders, WIDTH, HEIGHT, 20.0f);
+
+			glm::vec3 pos = camera.getPosition();
+			cout << "(" << pos.x << ", " << pos.y << ", " << pos.z << ")  " << endl;
 			light.use(shaders);
 
 			cube.setColor(glm::vec3(0.3, 0.1, 0.7));
@@ -202,6 +213,7 @@ int main()
 			cube2.draw(theProgram);
 			cube3.draw(theProgram);
 			cubeFloor.draw(theProgram);
+			cubeLight.draw(theProgram);
 
 			// Swap the screen buffers
 			glfwSwapBuffers(window);

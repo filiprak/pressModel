@@ -12,11 +12,12 @@ uniform mat4 transform;
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
+uniform mat4 normalModel;
 
 void main()
 {
     gl_Position = projection * view * model * transform * vec4(position, 1.0f);
-	FragPos = vec3(model * transform * vec4(position, 1.0f));
-	Normal = vec3(normalize(transform * vec4(normal, 0.0f)));
+	FragPos = vec3(model * vec4(position, 1.0f));
+	Normal = mat3(normalModel) * normal; 
 	TexCoords = vec2(texCoords.x, 1.0f - texCoords.y);
 } 
