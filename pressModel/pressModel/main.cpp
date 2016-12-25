@@ -4,8 +4,7 @@
 #include "camera.h"
 #include "light.h"
 #include "texture_loader.h"
-#include "mesh.h"
-#include "cuboid.h"
+#include "scene.h"
 #include <GLFW/glfw3.h>
 #include <SOIL.h>
 #include <iostream>
@@ -18,8 +17,9 @@ const GLuint WIDTH = 800, HEIGHT = 600;
 
 Camera camera(24.0f, 0.0f, 0.0f);
 
-glm::vec3 diffuseLightPos = glm::vec3(15.0f, 7.0f, 20.0f);
-Light light(diffuseLightPos);
+glm::vec3 diffuseLightPos = glm::vec3(10.0f, 20.0f, 30.0f);
+
+void RenderQuad();
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode)
 {
@@ -37,16 +37,23 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 			enable = true;
 		}
 	}
-	/*if (key == GLFW_KEY_DOWN)
-		camera.move(HORIZONTAL, -1.0f);
+	if (key == GLFW_KEY_UP)
+		diffuseLightPos.y += 1.0f;
+	if (key == GLFW_KEY_DOWN)
+		diffuseLightPos.y -= 1.0f;
 	if (key == GLFW_KEY_LEFT)
-		camera.move(VERTICAL, 1.0f);
+		diffuseLightPos.x -= 1.0f;
 	if (key == GLFW_KEY_RIGHT)
-		camera.move(VERTICAL, -1.0f);*/
-	if (key == GLFW_KEY_W)
+		diffuseLightPos.x += 1.0f;
+	if (key == GLFW_KEY_D)
+		diffuseLightPos.z -= 1.0f;
+	if (key == GLFW_KEY_E)
+		diffuseLightPos.z += 1.0f;
+
+	/*if (key == GLFW_KEY_W)
 		light.changeIntensity(0.1f);
 	if (key == GLFW_KEY_S)
-		light.changeIntensity(-0.1f);
+		light.changeIntensity(-0.1f);*/
 }
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
@@ -70,25 +77,6 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
 	cout << yoffset << endl;
 	camera.move(yoffset);
-}
-
-GLuint LoadMipmapTexture(GLuint texId, const char* fname)
-{
-	int width, height;
-	unsigned char* image = SOIL_load_image(fname, &width, &height, 0, SOIL_LOAD_RGB);
-	if (image == nullptr)
-		throw exception("Failed to load texture file");
-
-	GLuint texture;
-	glGenTextures(1, &texture);
-
-	glActiveTexture(texId);
-	glBindTexture(GL_TEXTURE_2D, texture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
-	glGenerateMipmap(GL_TEXTURE_2D);
-	SOIL_free_image_data(image);
-	glBindTexture(GL_TEXTURE_2D, 0);
-	return texture;
 }
 
 ostream& operator<<(ostream& os, const glm::mat4& mx)
@@ -133,7 +121,7 @@ int main()
 		glfwSetCursorPosCallback(window, mouse_callback);
 		glfwSetScrollCallback(window, scroll_callback);
 
-		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+		//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 		glewExperimental = GL_TRUE;
 		if (glewInit() != GLEW_OK)
@@ -153,43 +141,24 @@ int main()
 
 		// Build, compile and link shader program
 		ShaderProgram theProgram("main.vert.shader", "main.frag.shader");
+		ShaderProgram simpleDepthShader("depth.vert.shader", "depth.frag.shader");
+		ShaderProgram debugQuadShader("debug.vert.shader", "debug.frag.shader");
 		vector<ShaderProgram> shaders;
 		shaders.push_back(theProgram);
-
-
-		// Set the texture wrapping parameters
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// Set texture wrapping to GL_REPEAT (usually basic wrapping method)
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		// Set texture filtering parameters
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-		// prepare textures
-		TextureLoader textureLoader;
-		textureLoader.loadTextures();
-		const Texture weitiTex = textureLoader.getTexture("weitiTexture");
-		const Texture iipwTex = textureLoader.getTexture("iipwTexture");
-		const Texture komanTex = textureLoader.getTexture("komanTexture");
-		const Texture metalTex = textureLoader.getTexture("metalTexture");
-
-		Cuboid cube = Cuboid(2, 8, 4, glm::vec3(6,0,0), glm::vec3(0,0,0));
-		cube.addTexture(metalTex);
-		Cuboid cube2 = Cuboid(2, 8, 4, glm::vec3(-6, 0, 0), glm::vec3(0, 0, 0));
-		cube2.addTexture(metalTex);
-		Cuboid cube3 = Cuboid(14, 2, 4, glm::vec3(0, 5, 0), glm::vec3(0, 0, 0));
-		cube3.addTexture(metalTex);
-		Cuboid cubeFloor = Cuboid(100, 0.5, 100, glm::vec3(0, -4.25, 0), glm::vec3(0, 0, 0));
-		cubeFloor.addTexture(metalTex);
-
-		Cuboid cubeLight = Cuboid(1, 1, 1, diffuseLightPos, glm::vec3(0, 0, 0));
-		cubeLight.addTexture(komanTex);
 
 		// light
 		glm::vec3 objectColor = glm::vec3(0.9f, 0.0f, 0.0f);
 
+		TextureLoader textureLoader;
+		textureLoader.loadTextures();
+
+		Scene scene(diffuseLightPos, textureLoader, WIDTH, HEIGHT, 2048, 2048);
+
 		// main event loop ///////////////////////////////////////////////////////////////////////////////////////////
 		while (!glfwWindowShouldClose(window))
 		{
+			glm::vec3 oldLightPos = diffuseLightPos;
+
 			// Check if any events have been activiated (key pressed, mouse moved etc.) and call corresponding response functions
 			glfwPollEvents();
 
@@ -206,14 +175,18 @@ int main()
 
 			glm::vec3 pos = camera.getPosition();
 			cout << "(" << pos.x << ", " << pos.y << ", " << pos.z << ")  " << endl;
-			light.use(shaders);
 
-			cube.setColor(glm::vec3(0.3, 0.1, 0.7));
-			cube.draw(theProgram);
-			cube2.draw(theProgram);
-			cube3.draw(theProgram);
-			cubeFloor.draw(theProgram);
-			cubeLight.draw(theProgram);
+			scene.setLightPosition(diffuseLightPos);
+
+			// render scene
+			scene.renderShadow(simpleDepthShader);
+			scene.render(shaders, diffuseLightPos - oldLightPos);
+
+			// Render Depth map to quad
+			/*debugQuadShader.Use();
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, scene.getShadowDepthMapId());
+			RenderQuad();*/
 
 			// Swap the screen buffers
 			glfwSwapBuffers(window);
@@ -229,4 +202,35 @@ int main()
 	glfwTerminate();
 	
 	return 0;
+}
+
+// RenderQuad() Renders a 1x1 quad in NDC, best used for framebuffer color targets
+// and post-processing effects.
+GLuint quadVAO = 0;
+GLuint quadVBO;
+void RenderQuad()
+{
+	if (quadVAO == 0)
+	{
+		GLfloat quadVertices[] = {
+			// Positions        // Texture Coords
+			-1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+			-1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+			1.0f, 1.0f, 0.0f, 1.0f, 1.0f,
+			1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+		};
+		// Setup plane VAO
+		glGenVertexArrays(1, &quadVAO);
+		glGenBuffers(1, &quadVBO);
+		glBindVertexArray(quadVAO);
+		glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)0);
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+	}
+	glBindVertexArray(quadVAO);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	glBindVertexArray(0);
 }

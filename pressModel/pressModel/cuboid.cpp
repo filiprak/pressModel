@@ -1,5 +1,8 @@
 #include "cuboid.h"
 
+Cuboid::Cuboid() {
+
+}
 
 Cuboid::Cuboid(GLfloat width, GLfloat height, GLfloat depth,
 	glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)

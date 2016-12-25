@@ -9,7 +9,9 @@ class Cuboid : public Model {
 
 
 public:
-	// Constructor
+	// Constructors
+	Cuboid();
+
 	Cuboid(GLfloat width, GLfloat height, GLfloat depth,
 		glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f),
 		glm::vec3 rotation = glm::vec3(0.0f, 0.0f, 0.0f),

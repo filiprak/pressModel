@@ -28,6 +28,15 @@
     <Filter Include="Header Files\primitives">
       <UniqueIdentifier>{0a913ddb-1ed0-4d31-9fe0-229bcc83d30d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\shaders\main">
+      <UniqueIdentifier>{bb3953d5-71ab-4cd5-9612-4973d54f8b2b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\shaders\depth">
+      <UniqueIdentifier>{72f8b3db-ef97-423b-88e0-0fe630ef5766}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\shaders\debug">
+      <UniqueIdentifier>{c4bee71c-8350-4cbe-9e01-9e4e3270d4a9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -50,9 +59,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="camera.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="shader_prog.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -71,8 +77,17 @@
     <ClInclude Include="cuboid.h">
       <Filter>Header Files\primitives</Filter>
     </ClInclude>
-    <ClInclude Include="light.h">
+    <ClInclude Include="scene.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="light.h">
+      <Filter>Header Files\primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="camera.h">
+      <Filter>Header Files\primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="shadowmap.h">
+      <Filter>Header Files\primitives</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -82,13 +97,31 @@
     <Image Include="..\..\gkom-gl\gl_05\iipw.png">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="koman.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="metal.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
-    <None Include="main.frag.shader">
-      <Filter>Source Files\shaders</Filter>
-    </None>
     <None Include="main.vert.shader">
-      <Filter>Source Files\shaders</Filter>
+      <Filter>Source Files\shaders\main</Filter>
+    </None>
+    <None Include="main.frag.shader">
+      <Filter>Source Files\shaders\main</Filter>
+    </None>
+    <None Include="depth.frag.shader">
+      <Filter>Source Files\shaders\depth</Filter>
+    </None>
+    <None Include="depth.vert.shader">
+      <Filter>Source Files\shaders\depth</Filter>
+    </None>
+    <None Include="debug.frag.shader">
+      <Filter>Source Files\shaders\debug</Filter>
+    </None>
+    <None Include="debug.vert.shader">
+      <Filter>Source Files\shaders\debug</Filter>
     </None>
   </ItemGroup>
 </Project>

@@ -86,15 +86,23 @@
     <ClInclude Include="light.h" />
     <ClInclude Include="mesh.h" />
     <ClInclude Include="model.h" />
+    <ClInclude Include="scene.h" />
     <ClInclude Include="shader_prog.h" />
+    <ClInclude Include="shadowmap.h" />
     <ClInclude Include="texture_loader.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\gkom-gl\gl_05\iipw.png" />
     <Image Include="..\..\gkom-gl\gl_05\weiti.png" />
+    <Image Include="koman.png" />
+    <Image Include="metal.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="debug.frag.shader" />
+    <None Include="depth.frag.shader" />
+    <None Include="debug.vert.shader" />
     <None Include="main.frag.shader" />
+    <None Include="depth.vert.shader" />
     <None Include="main.vert.shader" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
