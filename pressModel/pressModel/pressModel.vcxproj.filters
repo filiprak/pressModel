@@ -57,6 +57,9 @@
     <ClCompile Include="camera.cpp">
       <Filter>Source Files\main</Filter>
     </ClCompile>
+    <ClCompile Include="barrel.cpp">
+      <Filter>Source Files\primitives</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="shader_prog.h">
@@ -87,6 +90,9 @@
       <Filter>Header Files\primitives</Filter>
     </ClInclude>
     <ClInclude Include="shadowmap.h">
+      <Filter>Header Files\primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="barrel.h">
       <Filter>Header Files\primitives</Filter>
     </ClInclude>
   </ItemGroup>

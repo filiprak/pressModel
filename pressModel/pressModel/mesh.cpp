@@ -16,6 +16,8 @@ Mesh::Mesh(vector<Vertex> vertices, vector<GLuint> indices, vector<Texture> text
 
 void Mesh::initMesh()
 {
+	if (vertices.size() == 0 || indices.size() == 0)
+		return;
 	glGenVertexArrays(1, &this->VAO);
 	glGenBuffers(1, &this->VBO);
 	glGenBuffers(1, &this->EBO);
@@ -82,6 +84,11 @@ void Mesh::addVertex(GLfloat x, GLfloat y, GLfloat z,
 void Mesh::addVertex(Vertex vertex) {
 	glm::normalize(vertex.Normal);
 	this->vertices.push_back(vertex);
+}
+
+void Mesh::addVertex(glm::vec3 pos, glm::vec3 norm, GLfloat tx, GLfloat ty) {
+	Vertex v = { pos, norm, glm::vec2(tx, ty) };
+	this->vertices.push_back(v);
 }
 
 void Mesh::addIndex(GLint index) {

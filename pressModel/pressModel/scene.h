@@ -11,6 +11,7 @@
 #include "light.h"
 #include "shadowmap.h"
 #include "cuboid.h"
+#include "barrel.h"
 #include "shader_prog.h"
 
 
@@ -19,6 +20,7 @@ class Scene {
 
 	// Scene elements
 	Cuboid cubeLight, cube, testcube, cube2, cube3, cubeFloor;
+	Barrel barrel1;
 
 	// common elements
 	ShadowMap shadowMap;
@@ -83,9 +85,6 @@ public:
 		// at first update light position
 		shadowMap.updateLightPosition(this->light.getPosition());
 
-		glEnable(GL_CULL_FACE);
-		glCullFace(GL_FRONT);
-
 		shadowMapShader.Use();
 		GLuint lightSpaceMatrixLocation = glGetUniformLocation(shadowMapShader.get_programID(), "lightSpaceMatrix");
 		glUniformMatrix4fv(lightSpaceMatrixLocation, 1, GL_FALSE, glm::value_ptr(this->shadowMap.getLightSpaceMatrix()));
@@ -98,8 +97,6 @@ public:
 		// draw model shadows
 		this->drawShadows(shadowMapShader);
 
-		glCullFace(GL_BACK);
-		glDisable(GL_CULL_FACE);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
@@ -113,6 +110,7 @@ private:
 		cube2.draw(shadowMapShader);
 		cube3.draw(shadowMapShader);
 		testcube.draw(shadowMapShader);
+		barrel1.draw(shadowMapShader);
 	}
 
 	void drawModels(vector<ShaderProgram> shaders, glm::vec3 delta) {
@@ -125,6 +123,8 @@ private:
 
 		cubeLight.move(delta);
 		cubeLight.draw(shaders[0]);
+
+		barrel1.draw(shaders[0]);
 	}
 
 	// Construct all models and place it on the scene
@@ -147,5 +147,8 @@ private:
 		this->cubeFloor = Cuboid(100, 0.5, 100, glm::vec3(0, -4.25, 0));
 		this->cubeFloor.addTexture(metalTex);
 		this->cubeFloor.setColor(glm::vec3(0.3, 0.7, 0.4));
+
+		this->barrel1 = Barrel(4, 10, 50, glm::vec3(0, 4, 0), glm::vec3(0.1));
+		this->barrel1.addTexture(metalTex);
 	}
 };

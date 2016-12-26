@@ -45,7 +45,10 @@ public:
 		GLfloat tx, GLfloat ty);
 
 	// Pushes new vertex into vertices vector
-	void Mesh::addVertex(Vertex vertex);
+	void addVertex(Vertex vertex);
+
+	// Pushes new vertex into vertices vector
+	void addVertex(glm::vec3 pos, glm::vec3 norm, GLfloat tx, GLfloat ty);
 
 	// Pushes new index into indices vector
 	void addIndex(GLint index);

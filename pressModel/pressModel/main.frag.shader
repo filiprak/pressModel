@@ -38,7 +38,7 @@ float calculateShadow(vec4 fragPosLightSpace, float bias)
             shadow += currentDepth - 0.1 * bias > pcfDepth  ? 1.0 : 0.0;        
         }    
     }
-    shadow /= 12.0;
+    shadow /= 23.0;
     
     if(projCoords.z > 1.0)
         shadow = 0.0;

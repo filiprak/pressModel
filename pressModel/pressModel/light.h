@@ -19,7 +19,7 @@ class Light
 
 public:
 	// Constructor
-	Light(glm::vec3 position = glm::vec3(0.0, 10.0, 0.0), GLfloat intensity = 1.0, GLfloat ambient = 0.2,
+	Light(glm::vec3 position = glm::vec3(0.0, 10.0, 0.0), GLfloat intensity = 1.0, GLfloat ambient = 0.5,
 		glm::vec3 color = glm::vec3(1.0, 1.0, 1.0)) {
 		this->position = position;
 		this->intensity = intensity;

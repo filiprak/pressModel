@@ -13,6 +13,8 @@ using namespace std;
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+const bool SHOW_CURSOR = false;
+
 const GLuint WIDTH = 800, HEIGHT = 600;
 
 Camera camera(24.0f, 0.0f, 0.0f);
@@ -121,7 +123,8 @@ int main()
 		glfwSetCursorPosCallback(window, mouse_callback);
 		glfwSetScrollCallback(window, scroll_callback);
 
-		//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+		if (!SHOW_CURSOR)
+			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 		glewExperimental = GL_TRUE;
 		if (glewInit() != GLEW_OK)
@@ -174,7 +177,7 @@ int main()
 			camera.use(shaders, WIDTH, HEIGHT, 20.0f);
 
 			glm::vec3 pos = camera.getPosition();
-			cout << "(" << pos.x << ", " << pos.y << ", " << pos.z << ")  " << endl;
+			//cout << "(" << pos.x << ", " << pos.y << ", " << pos.z << ")  " << endl;
 
 			scene.setLightPosition(diffuseLightPos);
 
