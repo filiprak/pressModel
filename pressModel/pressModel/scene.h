@@ -135,16 +135,16 @@ private:
 		const Texture komanTex = this->textureLoader.getTexture("komanTexture");
 		const Texture metalTex = this->textureLoader.getTexture("metalTexture");
 
-		this->cubeLight = Cuboid(1, 1, 1, this->light.getPosition(), glm::vec3(0, 0, 0));
-		this->cube = Cuboid(2, 8, 4, glm::vec3(6, 0, 0), glm::vec3(0, 0, 0));
+		this->cubeLight = Cuboid(1, 1, 1, this->light.getPosition());
+		this->cube = Cuboid(2, 8, 4, glm::vec3(6, 0, 0));
 		this->cube.addTexture(metalTex);
-		this->testcube = Cuboid(7, 9, 5, glm::vec3(0, 0, 10), glm::vec3(0, 0, 0));
+		this->testcube = Cuboid(7, 9, 5, glm::vec3(0, 4, 14), glm::vec3(0.3f));
 		this->testcube.addTexture(metalTex);
-		this->cube2 = Cuboid(2, 8, 4, glm::vec3(-6, 0, 0), glm::vec3(0, 0, 0));
+		this->cube2 = Cuboid(2, 8, 4, glm::vec3(-6, 0, 0));
 		this->cube2.addTexture(metalTex);
-		this->cube3 = Cuboid(14, 2, 4, glm::vec3(0, 5, 0), glm::vec3(0, 0, 0));
+		this->cube3 = Cuboid(14, 2, 4, glm::vec3(0, 5, 0));
 		this->cube3.addTexture(metalTex);
-		this->cubeFloor = Cuboid(100, 0.5, 100, glm::vec3(0, -4.25, 0), glm::vec3(0, 0, 0));
+		this->cubeFloor = Cuboid(100, 0.5, 100, glm::vec3(0, -4.25, 0));
 		this->cubeFloor.addTexture(metalTex);
 		this->cubeFloor.setColor(glm::vec3(0.3, 0.7, 0.4));
 	}

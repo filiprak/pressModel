@@ -5,16 +5,16 @@ Cuboid::Cuboid() {
 }
 
 Cuboid::Cuboid(GLfloat width, GLfloat height, GLfloat depth,
-	glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
+	glm::vec3 position, glm::vec3 texScale, glm::vec3 rotation, glm::vec3 scale)
 	: Model(position, rotation, scale) {
 	this->width = width;
 	this->height = height;
 	this->depth = depth;
 
-	this->prepareMeshes();
+	this->prepareMeshes(texScale);
 }
 
-void Cuboid::prepareMeshes() {
+void Cuboid::prepareMeshes(glm::vec3 texScale) {
 	GLfloat x = this->width / 2;
 	GLfloat y = this->height / 2;
 	GLfloat z = this->depth / 2;
@@ -39,13 +39,17 @@ void Cuboid::prepareMeshes() {
 		{ -x, y, -z },
 		{ x, y, -z },
 	};
+
+	GLfloat texH = this->height * texScale.y;
+	GLfloat texW = this->width * texScale.x;
+	GLfloat texD = this->depth * texScale.z;
 	WallHelper wallHelper[6] = {
-		{ 0, 1, 2, 3, 0, 0, 1, { { this->width, 0 }, { 0, 0 }, { 0, this->height }, { this->width, this->height } } }, //front
-		{ 5, 4, 7, 6, 0, 0, -1, { { this->width, 0 }, { 0, 0 }, { 0, this->height }, { this->width, this->height } } }, //back
-		{ 1, 5, 6, 2, -1, 0, 0, { { this->depth, 0 }, { 0, 0 }, { 0, this->height }, { this->depth, this->height } } }, //left
-		{ 4, 0, 3, 7, 1, 0, 0, { { this->depth, 0 }, { 0, 0 }, { 0, this->height }, { this->depth, this->height } } }, //right
-		{ 7, 3, 2, 6, 0, 1, 0, { { this->depth, 0 }, { 0, 0 }, { 0, this->width }, { this->depth, this->width } } }, //up
-		{ 4, 0, 1, 5, 0, -1, 0, { { this->depth, 0 }, { 0, 0 }, { 0, this->width }, { this->depth, this->width } } }, //down
+		{ 0, 1, 2, 3, 0, 0, 1, { { texW, 0 }, { 0, 0 }, { 0, texH }, { texW, texH } } }, //front
+		{ 5, 4, 7, 6, 0, 0, -1, { { texW, 0 }, { 0, 0 }, { 0, texH }, { texW, texH } } }, //back
+		{ 1, 5, 6, 2, -1, 0, 0, { { texD, 0 }, { 0, 0 }, { 0, texH }, { texD, texH } } }, //left
+		{ 4, 0, 3, 7, 1, 0, 0, { { texD, 0 }, { 0, 0 }, { 0, texH }, { texD, texH } } }, //right
+		{ 7, 3, 2, 6, 0, 1, 0, { { texD, 0 }, { 0, 0 }, { 0, texW }, { texD, texW } } }, //up
+		{ 4, 0, 1, 5, 0, -1, 0, { { texD, 0 }, { 0, 0 }, { 0, texW }, { texD, texW } } }, //down
 	};
 
 	for (int side = 0; side < 6; side++) {

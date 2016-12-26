@@ -21,30 +21,25 @@ uniform float ambientIntensity;
 uniform vec3 meshColor;
 uniform vec3 camPosition;
 
-float ShadowCalculation(vec4 fragPosLightSpace, float bias)
+
+float calculateShadow(vec4 fragPosLightSpace, float bias)
 {
-    // perform perspective divide
+    // perspective divide
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
-	// Transform to [0,1] range
     projCoords = projCoords * 0.5 + 0.5;
-    // Get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
     float closestDepth = texture(shadowMap, projCoords.xy).r; 
-    // Get depth of current fragment from light's perspective
     float currentDepth = projCoords.z;
-	// PCF
+	
     float shadow = 0.0;
     vec2 texelSize = 1.0 / textureSize(shadowMap, 0);
-    for(int x = -1; x <= 1; ++x)
-    {
-        for(int y = -1; y <= 1; ++y)
-        {
+    for(int x = -2; x <= 2; ++x) {
+        for(int y = -2; y <= 2; ++y) {
             float pcfDepth = texture(shadowMap, projCoords.xy + vec2(x, y) * texelSize).r; 
             shadow += currentDepth - 0.1 * bias > pcfDepth  ? 1.0 : 0.0;        
         }    
     }
-    shadow /= 9.0;
+    shadow /= 12.0;
     
-    // Keep the shadow at 0.0 when outside the far_plane region of the light's frustum.
     if(projCoords.z > 1.0)
         shadow = 0.0;
     return shadow;
@@ -67,11 +62,12 @@ void main()
 	float spec = pow(max(dot(viewDir, reflectDir), 0.0), 64);
 	vec3 specular = specIntensity * spec * lightColor; 
 
+	// Bias count
 	float bias = max(0.05 * (1.0 - dot(norm, lightDir)), 0.005); 
-	float shadow = ShadowCalculation(FragPosLightSpace, bias);
+	float shadow = calculateShadow(FragPosLightSpace, bias);
 	vec3 result = (ambientLight + (1.0 - shadow) * (diffuseLight + specular)) * meshColor;
 
     vec3 tex = (ambientLight + (1.0 - shadow) * (diffuseLight + specular)) * texture(metalTexture, TexCoords);
 
-	color = vec4(result, 1.0f);
+	color = vec4(tex, 1.0f);
 }

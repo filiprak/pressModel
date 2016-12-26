@@ -84,7 +84,7 @@ public:
 	}
 
 	// Abstract method, have to be overriden to define meshes of the model
-	virtual void prepareMeshes() = 0;
+	virtual void prepareMeshes(glm::vec3 texScale) = 0;
 
 	// Add mesh to mesh vector
 	void addMesh(Mesh mesh) {
