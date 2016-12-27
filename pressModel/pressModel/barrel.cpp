@@ -12,6 +12,7 @@ Barrel::Barrel(GLfloat radius, GLfloat height, GLuint sides,
 	this->radius = radius;
 	this->height = height;
 	this->sides = sides;
+	this->texScale = texScale;
 
 	this->prepareMeshes(texScale);
 }

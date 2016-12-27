@@ -17,7 +17,7 @@ class Model {
 	vector<Mesh> meshes;
 
 	// Position, rotation and scale relational to world space
-	glm::vec3 positionVec;
+	glm::vec3 positionVec, dynamicPos;
 	glm::vec3 rotationVec;
 	glm::vec3 scaleVec;
 
@@ -29,6 +29,7 @@ public:
 	// Constructors
 	Model() {
 		this->positionVec = glm::vec3(0.0f, 0.0f, 0.0f);
+		this->dynamicPos = glm::vec3(0.0f, 0.0f, 0.0f);
 		this->rotationVec = glm::vec3(0.0f, 0.0f, 0.0f);
 		this->scaleVec = glm::vec3(1.0f, 1.0f, 1.0f);
 
@@ -38,6 +39,7 @@ public:
 
 	Model(glm::vec3 position, glm::vec3 rotation, glm::vec3 scale) {
 		this->positionVec = position;
+		this->dynamicPos = position;
 		this->rotationVec = rotation;
 		this->scaleVec = scale;
 
@@ -69,6 +71,7 @@ public:
 	// Translates object in space
 	void move(glm::vec3 movement) {
 		this->transformMatrix = glm::translate(this->transformMatrix, movement);
+		this->dynamicPos += movement;
 	}
 
 	// Rotates object around x, y, z axis an angle
@@ -91,6 +94,11 @@ public:
 		meshes.push_back(mesh);
 	}
 
+	// Clear model meshes
+	void clear() {
+		meshes.clear();
+	}
+
 	// Adds texture to all meshes. Texture may be used later in shaders.
 	void addTexture(const Texture texture) {
 		for (GLuint i = 0; i < this->meshes.size(); i++)
@@ -106,5 +114,10 @@ public:
 	// Returns matrix defining model position in world space
 	glm::mat4 getModelMatrix() {
 		return this->modelMatrix;
+	}
+
+	// Returns actual position of model in worldspace
+	glm::vec3 getPosition() {
+		return this->dynamicPos;
 	}
 };

@@ -77,6 +77,7 @@
     <ClCompile Include="cuboid.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="mesh.cpp" />
+    <ClCompile Include="scene.cpp" />
     <ClCompile Include="shader_prog.cpp" />
     <ClCompile Include="texture_loader.cpp" />
   </ItemGroup>

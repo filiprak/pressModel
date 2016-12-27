@@ -22,5 +22,5 @@ void main()
 	FragPos = vec3(model * vec4(position, 1.0f));
 	Normal = mat3(normalModel) * normal; 
 	TexCoords = vec2(texCoords.x, 1.0f - texCoords.y);
-	FragPosLightSpace = lightSpaceMatrix * vec4(FragPos, 1.0);
+	FragPosLightSpace = lightSpaceMatrix * transform * vec4(FragPos, 1.0);
 } 

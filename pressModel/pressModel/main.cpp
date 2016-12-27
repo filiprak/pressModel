@@ -13,9 +13,9 @@ using namespace std;
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-const bool SHOW_CURSOR = false;
+const bool SHOW_CURSOR = true;
 
-const GLuint WIDTH = 800, HEIGHT = 600;
+const GLuint WIDTH = 1200, HEIGHT = 600;
 
 Camera camera(24.0f, 0.0f, 0.0f);
 
@@ -182,6 +182,7 @@ int main()
 			scene.setLightPosition(diffuseLightPos);
 
 			// render scene
+			scene.performMovement(1.0, 1.0);
 			scene.renderShadow(simpleDepthShader);
 			scene.render(shaders, diffuseLightPos - oldLightPos);
 
